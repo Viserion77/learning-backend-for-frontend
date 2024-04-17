@@ -1,10 +1,14 @@
 import express from 'express';
-const app = express();
-const port = 3000;
+import fs from 'fs';
 
-app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*');
-    next();
+const app = express();
+const port = 8080;
+
+app.get('/', (req, res) => {
+    const indexHtml = fs.readFileSync('index.html', 'utf-8');
+
+    res.setHeader('Content-Type', 'text/html');
+    res.send(indexHtml);
 });
 
 app.post('/carrinho/:id/atualizar/:produtoId',async (req, res) => {
@@ -65,7 +69,6 @@ const montarTela = (usuario, carrinho, produtos) => {
 
     return { sidebar, main };
 }
-
 
 app.listen(port, () => {
     console.log(`Servidor rodando na porta ${port}`);
