@@ -251,7 +251,7 @@
         const idUsuario = 1;
 
         (async () => {
-            const telaUri = `http://localhost:3000/tela/usuario/${idUsuario}/carrinho`;
+            const telaUri = `http://localhost:8080/tela/usuario/${idUsuario}/carrinho`;
             const dadosTela = await fetch(telaUri).then(res => res.json());
 
             montarSidebar(dadosTela.sidebar);
