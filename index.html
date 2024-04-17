@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Carrinho de compra</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 10px;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            width: 200px;
+            height: 100vh;
+            background-color: #f0f0f0;
+            padding: 10px;
+        }
+
+        .produtos {
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            width: calc(100% - 200px);
+            padding: 10px;
+        }
+
+        .produto {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            width: 200px;
+            height: 300px;
+            background-color: #fff;
+            margin: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .pesquisa {
+            width: 100%;
+            height: 30px;
+            margin-bottom: 10px;
+            padding: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .titulo-produto {
+            font-size: 18px;
+            margin: 0;
+        }
+
+        .descricao {
+            font-size: 14px;
+            margin: 0;
+        }
+
+        .preco {
+            font-size: 16px;
+            margin: 0;
+        }
+
+        .quantidade {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .botao-menos,
+        .botao-mais {
+            width: 30px;
+            height: 30px;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin: 0 5px;
+        }
+
+        .quantidade-comprada {
+            width: 50px;
+            height: 30px;
+            text-align: center;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .botao-voltar {
+            width: 100%;
+            height: 30px;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .titulo {
+            font-size: 24px;
+            margin: 0;
+        }
+
+        .total {
+            font-size: 18px;
+            margin: 0;
+        }
+
+        .botao-finalizar {
+            width: 100%;
+            height: 30px;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        .botao-menos:disabled,
+        .botao-mais:disabled {
+            background-color: #ccc;
+        }
+
+        .botao-menos:disabled:hover,
+        .botao-mais:disabled:hover {
+            cursor: not-allowed;
+        }
+
+        .botao-menos:hover,
+        .botao-mais:hover {
+            cursor: pointer;
+        }
+
+        .botao-finalizar:hover {
+            cursor: pointer;
+        }
+
+        .botao-finalizar:disabled {
+            background-color: #ccc;
+        }
+
+        .botao-finalizar:disabled:hover {
+            cursor: not-allowed;
+        }
+
+        .imagem {
+            width: 100%;
+            height: 150px;
+            background-color: #ccc;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div id="sidebar" class="sidebar">
+            <button class="botao-voltar">←</button>
+            <a class="titulo">Carrinho</a>
+            <p class="total" id="total">Total: R$ -,--</p>
+            <button class="botao-finalizar">Finalizar compra</button>
+        </div>
+        <div class="produtos" id="main">
+            <input class="pesquisa" type="text" placeholder="Pesquisar">
+        </div>
+    </div>
+    <script>
+        const addProdutoHtml = (produto, carrinho, elementoHtml) => {
+            const produtoCarrinho = carrinho.produtos.find(p => p.id === produto.id);
+            const quantidade = produtoCarrinho ? produtoCarrinho.quantidade : 0;
+
+            const divProduto = document.createElement('div');
+            divProduto.className = 'produto';
+
+            const titulo = document.createElement('p');
+            titulo.className = 'titulo-produto';
+            titulo.innerText = produto.nome;
+            divProduto.appendChild(titulo);
+
+            const descricao = document.createElement('p');
+            descricao.className = 'descricao';
+            descricao.innerText = produto.descricao;
+            divProduto.appendChild(descricao);
+
+            const preco = document.createElement('p');
+            preco.className = 'preco';
+            preco.innerText = `R$ ${produto.preco.toFixed(2).replace('.', ',')}`;
+            divProduto.appendChild(preco);
+
+            const imagem = document.createElement('div');
+            imagem.className = 'imagem';
+            divProduto.appendChild(imagem);
+
+            const quantidadeDiv = document.createElement('div');
+            quantidadeDiv.className = 'quantidade';
+            divProduto.appendChild(quantidadeDiv);
+
+            const botaoMenos = document.createElement('button');
+            botaoMenos.className = 'botao-menos';
+            botaoMenos.innerText = '-';
+            botaoMenos.disabled = quantidade === 0;
+            quantidadeDiv.appendChild(botaoMenos);
+
+            const quantidadeComprada = document.createElement('input');
+            quantidadeComprada.className = 'quantidade-comprada';
+            quantidadeComprada.type = 'number';
+            quantidadeComprada.value = quantidade;
+            quantidadeDiv.appendChild(quantidadeComprada);
+
+            const botaoMais = document.createElement('button');
+            botaoMais.className = 'botao-mais';
+            botaoMais.innerText = '+';
+            quantidadeDiv.appendChild(botaoMais);
+
+            elementoHtml.appendChild(divProduto);
+        }
+
+        const elementoHtmlTotal = document.getElementById('total');
+        const elementoHtmlProdutos = document.getElementById('main');
+        const idUsuario = 1;
+
+        (async () => {
+            const usuario = await fetch(`http://localhost:3000/user/${idUsuario}`).then(res => res.json());
+            const [produtos, carrinho] = await Promise.all([
+                fetch('http://localhost:3000/produtos').then(res => res.json()),
+                fetch(`http://localhost:3000/carrinho/${idUsuario}`).then(res => res.json())
+            ]);
+
+            const total = carrinho.produtos.reduce((acc, produto) => acc + produto.preco * produto.quantidade, 0);
+
+            for (const produto of produtos) {
+                addProdutoHtml(produto, carrinho, elementoHtmlProdutos)
+            };
+
+            elementoHtmlTotal.innerText = `Total: R$ ${total.toFixed(2).replace('.', ',')}`;
+        })()
+    </script>
+</body>
+</html>
