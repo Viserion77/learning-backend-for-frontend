@@ -170,84 +170,92 @@
 <body>
     <div class="container">
         <div id="sidebar" class="sidebar">
-            <button class="botao-voltar">←</button>
-            <a class="titulo">Carrinho</a>
-            <p class="total" id="total">Total: R$ -,--</p>
-            <button class="botao-finalizar">Finalizar compra</button>
+            <button class="botao-voltar" id="botao-voltar">-</button>
+            <a class="titulo" id="titulo">-</a>
+            <p class="total" id="total">-: R$ -,--</p>
+            <button class="botao-finalizar" id="botao-finalizar">-</button>
         </div>
         <div class="produtos" id="main">
-            <input class="pesquisa" type="text" placeholder="Pesquisar">
+            <input class="pesquisa" type="text" placeholder="-" id="pesquisa">
         </div>
     </div>
     <script>
-        const addProdutoHtml = (produto, carrinho, elementoHtml) => {
-            const produtoCarrinho = carrinho.produtos.find(p => p.id === produto.id);
-            const quantidade = produtoCarrinho ? produtoCarrinho.quantidade : 0;
+        const montarSidebar = (sidebar) => {
+            const botaoVoltar = document.getElementById('botao-voltar');
+            const titulo = document.getElementById('titulo');
+            const total = document.getElementById('total');
+            const botaoFinalizar = document.getElementById('botao-finalizar');
 
-            const divProduto = document.createElement('div');
-            divProduto.className = 'produto';
+            botaoVoltar.innerText = sidebar.backButton.text;
 
-            const titulo = document.createElement('p');
-            titulo.className = 'titulo-produto';
-            titulo.innerText = produto.nome;
-            divProduto.appendChild(titulo);
+            titulo.innerText = sidebar.title;
+            total.innerText = `${sidebar.details.label} R$ ${sidebar.details.value}`;
 
-            const descricao = document.createElement('p');
-            descricao.className = 'descricao';
-            descricao.innerText = produto.descricao;
-            divProduto.appendChild(descricao);
+            botaoFinalizar.innerText = sidebar.checkoutButton.text
+        }
+        const montarMain = (main) => {
+            const pesquisa = document.getElementById('pesquisa');
+            const produtos = document.getElementById('main');
 
-            const preco = document.createElement('p');
-            preco.className = 'preco';
-            preco.innerText = `R$ ${produto.preco.toFixed(2).replace('.', ',')}`;
-            divProduto.appendChild(preco);
+            pesquisa.placeholder = main.search.placeholder;
 
-            const imagem = document.createElement('div');
-            imagem.className = 'imagem';
-            divProduto.appendChild(imagem);
+            for (const produto of main.products) {
+                const divProduto = document.createElement('div');
+                divProduto.className = 'produto';
 
-            const quantidadeDiv = document.createElement('div');
-            quantidadeDiv.className = 'quantidade';
-            divProduto.appendChild(quantidadeDiv);
+                const titulo = document.createElement('p');
+                titulo.className = 'titulo-produto';
+                titulo.innerText = produto.title;
+                divProduto.appendChild(titulo);
 
-            const botaoMenos = document.createElement('button');
-            botaoMenos.className = 'botao-menos';
-            botaoMenos.innerText = '-';
-            botaoMenos.disabled = quantidade === 0;
-            quantidadeDiv.appendChild(botaoMenos);
+                const descricao = document.createElement('p');
+                descricao.className = 'descricao';
+                descricao.innerText = produto.description;
+                divProduto.appendChild(descricao);
 
-            const quantidadeComprada = document.createElement('input');
-            quantidadeComprada.className = 'quantidade-comprada';
-            quantidadeComprada.type = 'number';
-            quantidadeComprada.value = quantidade;
-            quantidadeDiv.appendChild(quantidadeComprada);
+                const preco = document.createElement('p');
+                preco.className = 'preco';
+                preco.innerText = produto.price;
+                divProduto.appendChild(preco);
 
-            const botaoMais = document.createElement('button');
-            botaoMais.className = 'botao-mais';
-            botaoMais.innerText = '+';
-            quantidadeDiv.appendChild(botaoMais);
+                const imagem = document.createElement('div');
+                imagem.className = 'imagem';
+                divProduto.appendChild(imagem);
 
-            elementoHtml.appendChild(divProduto);
+                const quantidadeDiv = document.createElement('div');
+                quantidadeDiv.className = 'quantidade';
+                divProduto.appendChild(quantidadeDiv);
+
+                const botaoMenos = document.createElement('button');
+                botaoMenos.className = 'botao-menos';
+                botaoMenos.innerText = '-';
+                quantidadeDiv.appendChild(botaoMenos);
+
+                const quantidadeComprada = document.createElement('input');
+                quantidadeComprada.className = 'quantidade-comprada';
+                quantidadeComprada.type = 'number';
+                quantidadeComprada.value = produto.quantity.value;
+                quantidadeComprada.min = produto.quantity.min;
+                quantidadeComprada.max = produto.quantity.max;
+                quantidadeDiv.appendChild(quantidadeComprada);
+
+                const botaoMais = document.createElement('button');
+                botaoMais.className = 'botao-mais';
+                botaoMais.innerText = '+';
+                quantidadeDiv.appendChild(botaoMais);
+
+                produtos.appendChild(divProduto);
+            }
         }
 
-        const elementoHtmlTotal = document.getElementById('total');
-        const elementoHtmlProdutos = document.getElementById('main');
         const idUsuario = 1;
 
         (async () => {
-            const usuario = await fetch(`http://localhost:3000/user/${idUsuario}`).then(res => res.json());
-            const [produtos, carrinho] = await Promise.all([
-                fetch('http://localhost:3000/produtos').then(res => res.json()),
-                fetch(`http://localhost:3000/carrinho/${idUsuario}`).then(res => res.json())
-            ]);
+            const telaUri = `http://localhost:3000/tela/usuario/${idUsuario}/carrinho`;
+            const dadosTela = await fetch(telaUri).then(res => res.json());
 
-            const total = carrinho.produtos.reduce((acc, produto) => acc + produto.preco * produto.quantidade, 0);
-
-            for (const produto of produtos) {
-                addProdutoHtml(produto, carrinho, elementoHtmlProdutos)
-            };
-
-            elementoHtmlTotal.innerText = `Total: R$ ${total.toFixed(2).replace('.', ',')}`;
+            montarSidebar(dadosTela.sidebar);
+            montarMain(dadosTela.main);
         })()
     </script>
 </body>
